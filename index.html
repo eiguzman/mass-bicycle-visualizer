@@ -35,27 +35,28 @@
 
     <script>
         // JavaScript to handle time slider functionality
-        const slider = document.getElementById('time-slider');
+        const timeSlider = document.getElementById('time-slider');
         const selectedTime = document.getElementById('selected-time');
-        const anyTime = document.getElementById('any-time');
-
+        const anyTimeLabel = document.getElementById('any-time');
+        function formatTime(minutes) {
+            const date = new Date(0, 0, 0, 0, minutes);  // Set hours & minutes
+            return date.toLocaleString('en-US', { timeStyle: 'short' }); // Format as HH:MM AM/PM
+        }
         // Function to update the displayed time
         function updateTimeDisplay() {
-            const value = parseInt(slider.value);
+            const value = Number(timeSlider.value);
             if (value === -1) {
                 selectedTime.style.display = 'none';
-                anyTime.style.display = 'inline';
+                anyTimeLabel.style.display = 'inline';
             } else {
-                const hours = Math.floor(value / 60).toString().padStart(2, '0');
-                const minutes = (value % 60).toString().padStart(2, '0');
-                selectedTime.textContent = `${hours}:${minutes}`;
+                selectedTime.textContent = formatTime(value);
                 selectedTime.style.display = 'inline';
-                anyTime.style.display = 'none';
+                anyTimeLabel.style.display = 'none';
             }
         }
 
         // Event listener for the slider
-        slider.addEventListener('input', updateTimeDisplay);
+        timeSlider.addEventListener('input', updateTimeDisplay);
         // Initialize display
         updateTimeDisplay();
     </script>
