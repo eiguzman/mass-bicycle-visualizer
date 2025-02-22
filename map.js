@@ -3,7 +3,6 @@ mapboxgl.accessToken = 'pk.eyJ1IjoiZWlndXptYW4iLCJhIjoiY203OGFhbXVoMHN4ajJrb3Z2Z
 
 const svg = d3.select('#map').select('svg');
 let stations = [];
-
 // Initialize the map
 const map = new mapboxgl.Map({
   container: 'map', // ID of the div where the map will render
@@ -49,19 +48,20 @@ map.on('load', () => {
   // Load the nested JSON file
   const jsonurl = "./data/bluebikes-stations.json"
   d3.json(jsonurl).then(jsonData => {
-    console.log('Loaded JSON Data:', jsonData);  // Log to verify structure
-    const stations = jsonData.data.stations;
-    console.log('Stations Array:', stations);
+    let stations = jsonData.data.stations;
   // Append circles to the SVG for each station
+  const radiusScale = d3.scaleSqrt()
+    .domain([0, d3.max(stations, (d) => d.totalTraffic)])
+    .range([0, 25]);
   const circles = svg.selectAll('circle')
     .data(stations)
     .enter()
     .append('circle')
-    .attr('r', 5)               // Radius of the circle
+    .attr('r', d => radiusScale(d.totalTraffic))  // Radius of the circle
     .attr('fill', 'steelblue')  // Circle fill color
     .attr('stroke', 'black')    // Circle border color
     .attr('stroke-width', 1)    // Circle border thickness
-    .attr('opacity', 0.8);      // Circle opacity    
+    .attr('opacity', 0.8);      // Circle opacity
   // Initial position update when map loads
   updatePositions();
   // Reposition markers on map interactions
@@ -75,6 +75,37 @@ map.on('load', () => {
       .attr('cx', d => getCoords(d).cx)  // Set the x-position using projected coordinates
       .attr('cy', d => getCoords(d).cy); // Set the y-position using projected coordinates
       }
+  const csvlink = "https://dsc106.com/labs/lab07/data/bluebikes-traffic-2024-03.csv";
+  d3.csv(csvlink).then(trips => {
+    departures = d3.rollup(
+      trips,
+      (v) => v.length,
+      (d) => d.start_station_id,
+    );
+    arrivals = d3.rollup(
+      trips,
+      (w) => w.length,
+      (a) => a.end_station_id,
+    );
+    stations = stations.map((station) => {
+      let id = station.short_name;
+      station.arrivals = arrivals.get(id) ?? 0;
+      station.departures = departures.get(id) ?? 0;
+      station.totalTraffic= station.arrivals + station.departures;
+      return station;
+    });
+    radiusScale.domain([0, d3.max(stations, (d) => d.totalTraffic)]);
+    // Update the circles now that we have totalTraffic values
+    circles.data(stations)  // Bind the updated stations data
+      .transition()     // Animate the transition
+      .attr('r', d => radiusScale(d.totalTraffic))  // Update the radius based on new traffic data
+      .each(function(d) {
+        // Add <title> for browser tooltips
+        d3.select(this)
+          .append('title')
+          .text(`${d.totalTraffic} trips (${d.departures} departures, ${d.arrivals} arrivals)`);
+      });
+      });
   }).catch(error => {
     console.error('Error loading JSON:', error);  // Handle errors if JSON loading fails
   }); 
@@ -85,3 +116,4 @@ function getCoords(station) {
   const { x, y } = map.project(point);  // Project to pixel coordinates
   return { cx: x, cy: y };  // Return as object for use in SVG attributes
 }
+
