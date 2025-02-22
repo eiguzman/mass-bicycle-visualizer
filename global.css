@@ -35,3 +35,24 @@ html, body {
     pointer-events: auto;
   }
 }
+
+#time-filter {
+  display: grid;
+  width:100%;
+  max-width: 35em;
+  align-items: baseline;
+  margin: 1em 0;
+  & em {
+    display: block;
+    margin-left: auto;
+  }
+  & time {
+    margin-left: auto;
+  }
+}
+
+#time-slider {
+  display: grid;
+  width: 100%;
+  max-width: 600px;
+}

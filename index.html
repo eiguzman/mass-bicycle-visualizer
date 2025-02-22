@@ -14,14 +14,50 @@
     <p>An interactive site that visualizes bicycle traffic in the greater 
         Boston area.
     </p>
+        <!-- Time Filter Section -->
+        <div id="time-filter">
+            <label for="time-slider">Filter by time:</label>
+            <input type="range" id="time-slider" min="-1" max="1440" value="-1" />
+            <time id="selected-time">00:00</time>
+            <em id="any-time" style="display: none;">(any time)</em>
+        </div>
     <div id="map">
         <svg></svg>
     </div>
+
+
     <!-- Mapbox GL JS JavaScript -->
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
     <!-- Load D3.js from CDN -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <!-- Load your custom map initialization script -->
     <script src="map.js"></script>
+
+    <script>
+        // JavaScript to handle time slider functionality
+        const slider = document.getElementById('time-slider');
+        const selectedTime = document.getElementById('selected-time');
+        const anyTime = document.getElementById('any-time');
+
+        // Function to update the displayed time
+        function updateTimeDisplay() {
+            const value = parseInt(slider.value);
+            if (value === -1) {
+                selectedTime.style.display = 'none';
+                anyTime.style.display = 'inline';
+            } else {
+                const hours = Math.floor(value / 60).toString().padStart(2, '0');
+                const minutes = (value % 60).toString().padStart(2, '0');
+                selectedTime.textContent = `${hours}:${minutes}`;
+                selectedTime.style.display = 'inline';
+                anyTime.style.display = 'none';
+            }
+        }
+
+        // Event listener for the slider
+        slider.addEventListener('input', updateTimeDisplay);
+        // Initialize display
+        updateTimeDisplay();
+    </script>
 </body>
 </html>
