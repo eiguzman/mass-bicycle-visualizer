@@ -12,15 +12,16 @@ html, body {
   height: 100%;
   width: 100%;
   display: flex;
-  justify-content: center; /* Center horizontally */
-  align-items: center;     /* Center vertically */
+  justify-content: center;
+  align-items: center;
 }
     
 #map {
-  width: 100%;    /* Adjust width to your desired size */
-  height: 100%;   /* Adjust height to your desired size */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: subtle shadow for effect */
-  border-radius: 8px; /* Optional: rounded corners */
+  width: 100%;
+  height: 100%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  margin-bottom: 1em;
 }
 
 #map svg {
@@ -30,9 +31,16 @@ html, body {
   height: 100%;
   pointer-events: none;
   & circle {
-    fill-opacity: .6;
-    stroke: black;
+    fill-opacity: .7;
     pointer-events: auto;
+    --color-departures: steelblue;
+    --color-arrivals: darkorange;
+    --color: color-mix(
+      in oklch,
+      var(--color-departures) calc(100% * var(--departure-ratio)),
+      var(--color-arrivals)
+      );
+    fill: var(--color);
   }
 }
 
@@ -55,4 +63,55 @@ html, body {
   display: grid;
   width: 100%;
   max-width: 600px;
+}
+
+.legend {
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  gap: 2rem;
+  min-width: 550px;
+}
+
+.legend-label {
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.swatch {
+  width: 20px;
+  height: 20px;
+  position: relative;
+}
+
+.swatch::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  background-color: currentColor;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.swatch[style*="--departure-ratio: 1"] {
+  color: steelblue;
+}
+
+.swatch[style*="--departure-ratio: 0"] {
+  color: darkorange;
+}
+
+.swatch[style*="--departure-ratio: 0.5"] {
+  color: color-mix(
+    in oklch,
+    steelblue calc(100% * .5), darkorange
+    );
 }
