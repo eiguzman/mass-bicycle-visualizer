@@ -1,2 +1,5 @@
 # mass-bicycle-visualizer
- A DSC106 Lab
+
+An interactive site that visualizes bicycle traffic in the Greater Boston area.
+
+*Originally a DSC106 Lab at the University of California, San Diego*
